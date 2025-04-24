@@ -2,6 +2,7 @@ package com.example.socio.service;
 
 import com.example.socio.entity.Group;
 import com.example.socio.entity.User;
+import com.example.socio.model.GroupMemberResponse;
 import com.example.socio.model.GroupRequest;
 import com.example.socio.model.GroupResponse;
 import com.example.socio.repository.GroupRepository;
@@ -11,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -51,7 +53,7 @@ public class GroupService {
         Long userId = getAuthenticatedUserId();
         List<Group> groups = groupRepository.findAll().stream()
                 .filter(group -> group.getCreatorId().equals(userId) || group.getMembers().stream().anyMatch(user -> user.getId().equals(userId)))
-                .collect(Collectors.toList());
+                .toList();
 
         return groups.stream().map(this::mapToResponse).collect(Collectors.toList());
     }
@@ -81,6 +83,18 @@ public class GroupService {
         response.setId(group.getId());
         response.setName(group.getName());
         response.setCreatorId(group.getCreatorId());
+
+        Set<GroupMemberResponse> members = group.getMembers().stream()
+                .map(membership -> {
+                    GroupMemberResponse memberResponse = new GroupMemberResponse();
+                    memberResponse.setId(membership.getId());
+                    memberResponse.setUsername(membership.getUsername());
+                    memberResponse.setJoinedAt(LocalDateTime.now());
+                    return memberResponse;
+                })
+                .collect(Collectors.toSet());
+
+        response.setMembers(members);
         return response;
     }
 

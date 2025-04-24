@@ -4,15 +4,18 @@ import com.example.socio.entity.User;
 import com.example.socio.enums.ROLE;
 import com.example.socio.enums.VISIBILITY;
 import com.example.socio.model.LoginRequest;
+import com.example.socio.model.ResetPasswordPayload;
 import com.example.socio.model.UserRegistrationRequest;
 import com.example.socio.model.UserResponse;
 import com.example.socio.repository.UserRepository;
+import com.example.socio.security.CustomAuthenticationToken;
 import com.example.socio.security.JwtTokenProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -75,10 +78,13 @@ public class AuthService {
     }
 
     @Transactional
-    public void resetPassword(String email) {
-        User user = userRepository.findByEmail(email)
+    public void resetPassword(ResetPasswordPayload request) {
+        if(request.getNewPassword() == null || request.getNewPassword().isBlank()) {
+            throw new RuntimeException("New password cannot be empty");
+        }
+        User user = userRepository.findByEmail(getAuthenticatedEmailId())
                 .orElseThrow(() -> new RuntimeException("User not found"));
-        user.setPassword(passwordEncoder.encode("new-default-password")); // Replace with actual logic
+        user.setPassword(passwordEncoder.encode(request.getNewPassword())); // Replace with actual logic
         user.setPasswordLastUpdated(new Date());
         userRepository.save(user);
     }
@@ -99,5 +105,10 @@ public class AuthService {
         response.setEmail(user.getEmail());
         response.setRole(user.getRole());
         return response;
+    }
+
+    private String getAuthenticatedEmailId() {
+        CustomAuthenticationToken authentication = (CustomAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+        return authentication.getEmail();
     }
 }

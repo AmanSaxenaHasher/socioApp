@@ -1,9 +1,6 @@
 package com.example.socio.controller;
 
-import com.example.socio.model.ApiResponse;
-import com.example.socio.model.LoginRequest;
-import com.example.socio.model.UserRegistrationRequest;
-import com.example.socio.model.UserResponse;
+import com.example.socio.model.*;
 import com.example.socio.service.AuthService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,8 +28,8 @@ public class AuthController {
     }
 
     @PostMapping("/reset-password")
-    public ResponseEntity<ApiResponse<String>> resetPassword(@Valid @RequestBody String email) {
-        authService.resetPassword(email);
+    public ResponseEntity<ApiResponse<String>> resetPassword(@Valid @RequestBody ResetPasswordPayload request) {
+        authService.resetPassword(request);
         return ResponseEntity.ok(new ApiResponse<>(true, "Password reset email sent", null));
     }
 }
