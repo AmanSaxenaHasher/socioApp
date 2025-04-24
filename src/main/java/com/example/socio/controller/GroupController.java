@@ -22,7 +22,24 @@ public class GroupController {
     }
 
     @GetMapping
-    public ResponseEntity<List<GroupResponse>> getAllGroups() {
-        return ResponseEntity.ok(groupService.getAllGroups());
+    public ResponseEntity<List<GroupResponse>> getAllGroups(@RequestParam(required = false) String searchTerm) {
+        return ResponseEntity.ok(groupService.getAllGroups(searchTerm));
+    }
+
+    @GetMapping("/user-specific")
+    public ResponseEntity<List<GroupResponse>> getUserSpecificGroups() {
+        return ResponseEntity.ok(groupService.getUserSpecificGroups());
+    }
+
+    @PostMapping("/{groupId}/addUser/{userId}")
+    public ResponseEntity<Void> addUserToGroup(@PathVariable Long groupId, @PathVariable Long userId) {
+        groupService.addUserToGroup(groupId, userId);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/{groupId}/removeUser/{userId}")
+    public ResponseEntity<Void> removeUserFromGroup(@PathVariable Long groupId, @PathVariable Long userId) {
+        groupService.removeUserFromGroup(groupId, userId);
+        return ResponseEntity.ok().build();
     }
 }
