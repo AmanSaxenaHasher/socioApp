@@ -2,6 +2,7 @@ package com.example.socio.service;
 
 import com.example.socio.entity.Group;
 import com.example.socio.entity.User;
+import com.example.socio.model.GroupMemberAndDetailsResponse;
 import com.example.socio.model.GroupMemberResponse;
 import com.example.socio.model.GroupRequest;
 import com.example.socio.model.GroupResponse;
@@ -49,13 +50,25 @@ public class GroupService {
         return groups.stream().map(this::mapToResponse).collect(Collectors.toList());
     }
 
-    public List<GroupResponse> getUserSpecificGroups() {
-        Long userId = getAuthenticatedUserId();
-        List<Group> groups = groupRepository.findAll().stream()
-                .filter(group -> group.getCreatorId().equals(userId) || group.getMembers().stream().anyMatch(user -> user.getId().equals(userId)))
-                .toList();
+    public GroupMemberAndDetailsResponse getGroupMembers(Long groupId) {
+        Group group = groupRepository.findById(groupId)
+                .orElseThrow(() -> new RuntimeException("Group not found"));
 
-        return groups.stream().map(this::mapToResponse).collect(Collectors.toList());
+        GroupMemberAndDetailsResponse response = new GroupMemberAndDetailsResponse();
+        response.setGroupId(group.getId());
+        response.setGroupName(group.getName());
+
+         response.setMembers(group.getMembers().stream()
+                .map(member -> {
+                    GroupMemberResponse groupResponse = new GroupMemberResponse();
+                    groupResponse.setId(member.getId());
+                    groupResponse.setUsername(member.getUsername());
+                    groupResponse.setJoinedAt(LocalDateTime.now());
+                    return groupResponse;
+                })
+                .collect(Collectors.toSet()));
+
+         return response;
     }
 
     public void addUserToGroup(Long groupId, Long userId) {

@@ -34,6 +34,10 @@ public class UserInteractionService {
             throw new RuntimeException("Already following this user");
         }
 
+        if(targetUserId.equals(getAuthenticatedUserId())) {
+            throw new RuntimeException("Cannot follow yourself");
+        }
+
         UserInteraction interaction = new UserInteraction();
         interaction.setFollower(follower);
         interaction.setFollowee(followee);

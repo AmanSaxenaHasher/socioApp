@@ -1,5 +1,7 @@
 package com.example.socio.controller;
 
+import com.example.socio.model.GroupMemberAndDetailsResponse;
+import com.example.socio.model.GroupMemberResponse;
 import com.example.socio.model.GroupRequest;
 import com.example.socio.model.GroupResponse;
 import com.example.socio.service.GroupService;
@@ -8,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/groups")
@@ -26,9 +29,9 @@ public class GroupController {
         return ResponseEntity.ok(groupService.getAllGroups(searchTerm));
     }
 
-    @GetMapping("/user-specific")
-    public ResponseEntity<List<GroupResponse>> getUserSpecificGroups() {
-        return ResponseEntity.ok(groupService.getUserSpecificGroups());
+    @GetMapping("/{groupId}/members")
+    public ResponseEntity<GroupMemberAndDetailsResponse> getGroupMembers(@PathVariable Long groupId) {
+        return ResponseEntity.ok(groupService.getGroupMembers(groupId));
     }
 
     @PostMapping("/{groupId}/addUser/{userId}")
