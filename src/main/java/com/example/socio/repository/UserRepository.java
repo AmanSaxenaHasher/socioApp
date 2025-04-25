@@ -18,6 +18,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query("SELECT ui.followee FROM UserInteraction ui WHERE ui.follower.id = :id")
     Optional<List<User>> findFollowingByUserId(@Param("id") Long id);
 
+    @Query("SELECT ui.followee.id FROM UserInteraction ui WHERE ui.follower.id = :userId")
+    List<Long> findFollowingIds(@Param("userId") Long userId);
+
     Optional<User> findByEmail(String email);
 
     Optional<User> findByEmailIgnoreCase(String email);

@@ -10,6 +10,7 @@ public class PostResponse {
     private Long id;
     private String content;
     private Long userId;
-    private String username; // Username of the post owner
-    private Set<User> likedByUsers;  // Number of likes on the post
+    private String username;
+    private Set<User> likedByUsers;
+    private Set<CommentResponse> comments;
 }
